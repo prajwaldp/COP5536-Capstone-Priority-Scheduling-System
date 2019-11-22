@@ -3,28 +3,21 @@ import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.LinkedList;
 
-/**
- * Created by Vikaasa on 3/14/2016.
- */
 public class RedBlackTree {
     public Node nil = new Node(0, 0, 0);
     public Node root = nil;
 
     public String output = "";
 
-    // A function to insert an event with two integer values, buildingNums and
-    // count, in a Red
-    // Black Tree.
-    // It has a time complexity of O(log n).
     public Node insert(int buildingNums, int total_time) {
         Node node = new Node(buildingNums, 0, total_time);
 
-        node.setColor('r');
+        node.setRed();
         node.setLeft(nil);
         node.setRight(nil);
         if (root == nil) {
             root = node;
-            root.setColor('b');
+            root.setBlack();
             root.setParent(nil);
             return root;
         }
@@ -60,15 +53,15 @@ public class RedBlackTree {
     // The possible violation is pushed up toward the root, until it reaches the
     // root, which can just be made black.
     public void insertFixUp(Node z) {
-        while (z.getParent().getColor() == 'r') {
+        while (z.getParent().isRed()) {
             if (z.getParent() == z.getParent().getParent().getLeft()) {
                 // z's parent is a left child.
                 Node y = z.getParent().getParent().getRight();
-                if (y.getColor() == 'r') {
+                if (y.isRed()) {
                     // Case 1: z's uncle y is red.
-                    z.getParent().setColor('b');
-                    y.setColor('b');
-                    z.getParent().getParent().setColor('r');
+                    z.getParent().setBlack();
+                    y.setBlack();
+                    z.getParent().getParent().setRed();
                     z = z.getParent().getParent();
                 } else {
                     if (z == z.getParent().getRight()) {
@@ -77,18 +70,18 @@ public class RedBlackTree {
                         leftRotate(z);
                     }
                     // Case 3: z's uncle y is black and z is a left child.
-                    z.getParent().setColor('b');
-                    z.getParent().getParent().setColor('r');
+                    z.getParent().setBlack();
+                    z.getParent().getParent().setRed();
                     rightRotate(z.getParent().getParent());
                 }
             } else {
                 // z's parent is a right child.
                 Node y = z.getParent().getParent().getLeft();
-                if (y.getColor() == 'r') {
+                if (y.isRed()) {
                     // Case 1: z's uncle y is red.
-                    z.getParent().setColor('b');
-                    y.setColor('b');
-                    z.getParent().getParent().setColor('r');
+                    z.getParent().setBlack();
+                    y.setBlack();
+                    z.getParent().getParent().setRed();
                     z = z.getParent().getParent();
                 } else {
                     if (z == z.getParent().getLeft()) {
@@ -97,14 +90,14 @@ public class RedBlackTree {
                         rightRotate(z);
                     }
                     // Case 3: z's uncle y is black and z is a right child.
-                    z.getParent().setColor('b');
-                    z.getParent().getParent().setColor('r');
+                    z.getParent().setBlack();
+                    z.getParent().getParent().setRed();
                     leftRotate(z.getParent().getParent());
                 }
             }
         }
         // The root is always black.
-        root.setColor('b');
+        root.setBlack();
     }
 
     // This function performs a left rotation around the node ‘x’.
@@ -160,7 +153,7 @@ public class RedBlackTree {
     public void delete(Node z) {
         Node y = z; // y is the node that was either removed or moved within the tree.
         Node x; // x is the node that will move into y's original position
-        char origColor = y.getColor(); //// need to know whether y was black
+        int origColor = y.getColor(); //// need to know whether y was black
         if (z.getLeft() == nil) {
             // no left child?
             x = z.getRight();
@@ -208,68 +201,68 @@ public class RedBlackTree {
     // This function fixes the possible violation of the red-black properties
     // caused by deleting a node using the delete() function.
     public void deleteFixUp(Node x) {
-        while (x != root && x.getColor() == 'b') {
+        while (x != root && x.isBlack()) {
             if (x == x.getParent().getLeft()) {
                 Node w = x.getParent().getRight();
-                if (w.getColor() == 'r') {
+                if (w.isRed()) {
                     // Case 1: x's sibling w is red.
-                    w.setColor('b');
-                    x.getParent().setColor('r');
+                    w.setBlack();
+                    x.getParent().setRed();
                     leftRotate(x.getParent());
                     w = x.getParent().getRight();
                 }
-                if (w.getLeft().getColor() == 'b' && w.getRight().getColor() == 'b') {
+                if (w.getLeft().isBlack() && w.getRight().isBlack()) {
                     // Case 2: x's sibling w is black, and both of w's children are black.
-                    w.setColor('r');
+                    w.setRed();
                     x = x.getParent();
                 } else {
-                    if (w.getRight().getColor() == 'b') {
+                    if (w.getRight().isBlack()) {
                         // Case 3: x's sibling w is black, and the left child of w is red,
                         // and w's right child is black.
-                        w.getLeft().setColor('b');
-                        w.setColor('r');
+                        w.getLeft().setBlack();
+                        w.setRed();
                         rightRotate(w);
                         w = x.getParent().getRight();
                     }
                     // Case 4: x's sibling w is black, and the right child of w is red.
                     w.setColor(x.getParent().getColor());
-                    x.getParent().setColor('b');
-                    w.getRight().setColor('b');
+                    x.getParent().setBlack();
+                    w.getRight().setBlack();
                     leftRotate(x.getParent());
                     x = root;
                 }
             } else {
                 Node w = x.getParent().getLeft();
-                if (w.getColor() == 'r') {
+                if (w.isRed()) {
                     // Case 1: x's sibling w is red.
-                    w.setColor('b');
-                    x.getParent().setColor('r');
+                    w.setBlack();
+                    x.getParent().setRed();
                     rightRotate(x.getParent());
                     w = x.getParent().getLeft();
                 }
-                if (w.getRight().getColor() == 'b' && w.getLeft().getColor() == 'b') {
+                if (w.getRight().isBlack() && w.getLeft().isBlack()) {
                     // Case 2: x's sibling w is black, and both of w's children are black.
-                    w.setColor('r');
+                    w.setRed();
                     x = x.getParent();
                 } else {
-                    if (w.getLeft().getColor() == 'b') {
+                    if (w.getLeft().isBlack()) {
                         // Case 3: x's sibling w is black, wand the right child of w is red,
                         // and w's left child is black.
-                        w.getRight().setColor('b');
-                        w.setColor('r');
+                        w.getRight().setBlack();
+                        w.setRed();
                         leftRotate(w);
                         w = x.getParent().getLeft();
                     }
                     // Case 4: x's sibling w is black, and the left child of w is red.
                     w.setColor(x.getParent().getColor());
-                    x.getParent().setColor('b');
-                    w.getLeft().setColor('b');
+                    x.getParent().setBlack();
+                    w.getLeft().setBlack();
                     rightRotate(x.getParent());
                     x = root;
                 }
             }
         }
-        x.setColor('b');
+        x.setBlack();
     }
 
     // This function searches the Red Black Tree for a node with buildingNums = ‘x',
@@ -601,9 +594,9 @@ public class RedBlackTree {
         // node.setCount(arr[mid][1]);
         // by default, node is colored black.
         if (lvl == 0) // if current level is pointing to root level
-            node.setColor('b');
+            node.setBlack();
         if (lvl == h - 1) // current level is equal to the level immediately above sentinel nodes
-            node.setColor('r');
+            node.setRed();
         node.setLeft(initializeRBT(arr, start, mid - 1, lvl + 1, h));
         node.getLeft().setParent(node);
         node.setRight(initializeRBT(arr, mid + 1, end, lvl + 1, h));

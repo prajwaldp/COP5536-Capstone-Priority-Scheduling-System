@@ -5,14 +5,17 @@ public class Node {
     Node left;
     Node right;
     Node parent;
-    char color;
+    int color;
     public HeapItem heapItem;
+
+    private static int BLACK = 0;
+    private static int RED = 1;
 
     Node() {
         this.left = null;
         this.right = null;
         this.parent = null;
-        this.color = 'b';
+        this.color = BLACK;
         this.heapItem = null;
     }
 
@@ -20,7 +23,7 @@ public class Node {
         this.left = null;
         this.right = null;
         this.parent = null;
-        this.color = 'b';
+        this.color = BLACK;
         this.heapItem = null;
         this.buildingNums = buildingNums;
         this.executed_time = executed_time;
@@ -87,7 +90,7 @@ public class Node {
         this.total_time = total_time;
     }
 
-    public char getColor() {
+    public int getColor() {
         return color;
     }
 
@@ -97,5 +100,25 @@ public class Node {
 
     public void setHeapItem(HeapItem heapItem) {
         this.heapItem = heapItem;
+    }
+
+    public void setColor(int color) {
+        this.color = color;
+    }
+
+    public void setBlack() {
+        this.setColor(BLACK);
+    }
+
+    public void setRed() {
+        this.setColor(RED);
+    }
+
+    public boolean isRed() {
+        return this.color == RED;
+    }
+
+    public boolean isBlack() {
+        return this.color == BLACK;
     }
 }
