@@ -149,7 +149,7 @@ public class bbst {
                     if (print == nil) {
                         System.out.print("(0,0,0)");
                     } else
-                        System.out.print("(" + print.getBuildingNums() + "," + print.getExecutedTime() + ","
+                        System.out.print("(" + print.getBuildingNum() + "," + print.getExecutedTime() + ","
                                 + print.getTotalTime() + ")");
                 }
 

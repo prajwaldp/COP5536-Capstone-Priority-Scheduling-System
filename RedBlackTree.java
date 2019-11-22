@@ -22,23 +22,23 @@ public class RedBlackTree {
         }
         
         Node curr = this.root;
-        Node parent = this.root;
+        Node prev = this.root;
 
         while (curr != nil) {
-            parent = curr;
-            if (n.getBuildingNums() < curr.getBuildingNums()) {
+            prev = curr;
+            if (n.getBuildingNum() < curr.getBuildingNum()) {
                 curr = curr.getLeft();
             } else {
                 curr = curr.getRight();
             }
         }
         
-        n.setParent(parent);
+        n.setParent(prev);
         
-        if (n.getBuildingNums() < parent.getBuildingNums()) {
-            parent.setLeft(n);
+        if (n.getBuildingNum() < prev.getBuildingNum()) {
+            prev.setLeft(n);
         } else {
-            parent.setRight(n);
+            prev.setRight(n);
         }
         
         this.balanceAfterInserting(n);
@@ -266,9 +266,9 @@ public class RedBlackTree {
     public Node search(int x) {
         Node ptr = root;
         while (ptr != nil) {
-            if (ptr.getBuildingNums() == x)
+            if (ptr.getBuildingNum() == x)
                 return ptr;
-            else if (ptr.getBuildingNums() < x)
+            else if (ptr.getBuildingNum() < x)
                 ptr = ptr.getRight();
             else
                 ptr = ptr.getLeft();
@@ -283,21 +283,21 @@ public class RedBlackTree {
             return;
         }
 
-        if(root.getBuildingNums()>a)
+        if(root.getBuildingNum()>a)
         {
-            // System.out.println(root.getBuildingNums());
+            // System.out.println(root.getBuildingNum());
             search_range(root.getLeft(),a,b);
         }
 
-        if(a <= root.getBuildingNums() && root.getBuildingNums() <= b)
+        if(a <= root.getBuildingNum() && root.getBuildingNum() <= b)
         {
-            // System.out.println(root.getBuildingNums());
-            this.output= this.output + "("+root.getBuildingNums()+"," + root.getExecutedTime()+"," +root.getTotal_time()+ "),";
+            // System.out.println(root.getBuildingNum());
+            this.output= this.output + "("+root.getBuildingNum()+"," + root.getExecutedTime()+"," +root.getTotal_time()+ "),";
         }
 
-        if(root.getBuildingNums()< b)
+        if(root.getBuildingNum()< b)
         {
-            // System.out.println(root.getBuildingNums());
+            // System.out.println(root.getBuildingNum());
             search_range(root.getRight(),a,b);
         }
     }
@@ -380,7 +380,7 @@ public class RedBlackTree {
             return;
         }
         inOrder(root.getLeft());
-        System.out.print(root.getBuildingNums() + "("+root.getTotalTime()+ ") " + root.color + "-> ");
+        System.out.print(root.getBuildingNum() + "("+root.getTotalTime()+ ") " + root.color + "-> ");
         inOrder(root.getRight());
     }
 
@@ -389,7 +389,7 @@ public class RedBlackTree {
         if (root == nil) {
             return;
         }
-        System.out.print(root.getBuildingNums() + "->");
+        System.out.print(root.getBuildingNum() + "->");
         preOrder(root.getLeft());
         preOrder(root.getRight());
     }
@@ -401,7 +401,7 @@ public class RedBlackTree {
         }
         postOrder(root.getLeft());
         postOrder(root.getRight());
-        System.out.print(root.getBuildingNums() + "->");
+        System.out.print(root.getBuildingNum() + "->");
     }
 
     // Function to print traversal
@@ -447,7 +447,7 @@ public class RedBlackTree {
     // int lenLinkedList = lists.get(i).size();
     // for (int j = 0; j < lenLinkedList; j++) {
     // Node tmp = lists.get(i).get(j);
-    // System.out.print(" " + "[" + tmp.getBuildingNums() + "," + tmp.getCount() +
+    // System.out.print(" " + "[" + tmp.getBuildingNum() + "," + tmp.getCount() +
     // "]" + tmp.getColor());
     // }
     // System.out.println(" ");

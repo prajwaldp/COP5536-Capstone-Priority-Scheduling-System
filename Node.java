@@ -38,7 +38,7 @@ public class Node {
         return this.parent;
     }
 
-    public int getBuildingNums() {
+    public int getBuildingNum() {
         return this.buildingNums;
     }
 
