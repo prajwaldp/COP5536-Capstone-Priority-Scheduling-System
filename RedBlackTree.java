@@ -16,6 +16,7 @@ public class RedBlackTree {
         
         if (this.root == nil) {
             n.setBlack();
+            n.setParent(nil);
             this.root = n;
             return this.root;
         }
@@ -146,7 +147,7 @@ public class RedBlackTree {
     public void delete(Node z) {
         Node y = z; // y is the node that was either removed or moved within the tree.
         Node x; // x is the node that will move into y's original position
-        char origColor = y.getColor(); //// need to know whether y was black
+        int origColor = y.getColor(); //// need to know whether y was black
         if (z.getLeft() == nil) {
             // no left child?
             x = z.getRight();
