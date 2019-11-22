@@ -1,0 +1,11 @@
+{
+    "configurations": [
+        {
+            "type": "java",
+            "name": "CodeLens (Launch) - bbst",
+            "request": "launch",
+            "mainClass": "bbst",
+            "projectName": "ADSv3.0_6b06a03"
+        }
+    ]
+}
