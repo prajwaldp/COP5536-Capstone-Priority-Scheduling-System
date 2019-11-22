@@ -1,5 +1,3 @@
-
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.LinkedList;
 
@@ -9,50 +7,45 @@ public class RedBlackTree {
 
     public String output = "";
 
-    public Node insert(int buildingNums, int total_time) {
-        Node node = new Node(buildingNums, 0, total_time);
+    public Node insert(int buildingNum, int totalTime) {
+        Node n = new Node(buildingNum, 0, totalTime);
 
-        node.setRed();
-        node.setLeft(nil);
-        node.setRight(nil);
-        if (root == nil) {
-            root = node;
-            root.setBlack();
-            root.setParent(nil);
-            return root;
+        n.setRed();
+        n.setLeft(nil);
+        n.setRight(nil);
+        
+        if (this.root == nil) {
+            n.setBlack();
+            this.root = n;
+            return this.root;
         }
-        Node cur = root;
-        Node pre = root;
-        // Go down the RBT from the root, turning left or right depending on
-        // how the new node's buildingNums compares with cur's buildingNums, until we
-        // reach a nil node.
+        
+        Node curr = this.root;
+        Node parent = this.root;
 
-        while (cur != nil) {
-            pre = cur;
-            if (node.getBuildingNums() < cur.getBuildingNums()) {
-                cur = cur.getLeft();
+        while (curr != nil) {
+            parent = curr;
+            if (n.getBuildingNums() < curr.getBuildingNums()) {
+                curr = curr.getLeft();
             } else {
-                cur = cur.getRight();
+                curr = curr.getRight();
             }
         }
-        node.setParent(pre);
-        if (node.getBuildingNums() < pre.getBuildingNums()) {
-            pre.setLeft(node);
+        
+        n.setParent(parent);
+        
+        if (n.getBuildingNums() < parent.getBuildingNums()) {
+            parent.setLeft(n);
         } else {
-            pre.setRight(node);
+            parent.setRight(n);
         }
-        // Call insertFixUp() to fix possible violation of Red Black Tree properties due
-        // to insert operation.
-        insertFixUp(node);
+        
+        this.balanceAfterInserting(n);
 
-        return node;
+        return n;
     }
 
-    // This function fixes the possible violation of the red-black properties of the
-    // Red Black Tree when the insert() function is invoked.
-    // The possible violation is pushed up toward the root, until it reaches the
-    // root, which can just be made black.
-    public void insertFixUp(Node z) {
+    public void balanceAfterInserting(Node z) {
         while (z.getParent().isRed()) {
             if (z.getParent() == z.getParent().getParent().getLeft()) {
                 // z's parent is a left child.
@@ -153,7 +146,7 @@ public class RedBlackTree {
     public void delete(Node z) {
         Node y = z; // y is the node that was either removed or moved within the tree.
         Node x; // x is the node that will move into y's original position
-        int origColor = y.getColor(); //// need to know whether y was black
+        char origColor = y.getColor(); //// need to know whether y was black
         if (z.getLeft() == nil) {
             // no left child?
             x = z.getRight();
@@ -379,108 +372,6 @@ public class RedBlackTree {
         } else
             System.out.println("0");
     }
-
-    // This function is a recursive function that returns an array of two nodes
-    // which identify the next and previous nodes with value of ‘ID’ around the
-    // value of ‘key’,
-    // even when node with buildingNums = key is not present in the tree.
-    // The time complexity of this function is O(log n).
-    // public Node[] findNextPrev(Node root, Node[] res, int key) {
-    // if (root == nil) {
-    // return null;
-    // }
-    // if (root.getBuildingNums() == key) {
-    // if (root.getLeft() != nil) {
-    // Node tmp = root.getLeft();
-    // while (tmp.getRight() != nil) {
-    // tmp = tmp.getRight();
-    // }
-    // res[0] = tmp;
-    // }
-    // if (root.getRight() != nil) {
-    // Node tmp = root.getRight();
-    // while (tmp.getLeft() != nil)
-    // tmp = tmp.getLeft();
-    // res[1] = tmp;
-    // }
-    // return res;
-    // }
-    // if (root.getBuildingNums() > key) {
-    // res[1] = root;
-    // findNextPrev(root.getLeft(), res, key);
-    // } else {
-    // res[0] = root;
-    // findNextPrev(root.getRight(), res, key);
-    // }
-    // return res;
-    // }
-
-    // This function calls the findNextPrev() function, passing ‘root’, ‘res’, and
-    // ‘ID’ as parameters,
-    // and prints the returned next node’s buildingNums and count, if a next node
-    // was found.
-    // If no next node was found, then '0 0' is printed.
-    // The time complexity of this function is O(log n).
-    // public void next(int buildingNums) {
-    // Node[] res = new Node[2];
-    // Node[] ans = findNextPrev(root, res, buildingNums);
-    // Node next = ans[1];
-    // if (next != null)
-    // System.out.println(next.getBuildingNums() + " " + next.getCount());
-    // else
-    // System.out.println("0 0");
-    // }
-
-    // This function calls the findNextPrev() function, passing ‘root’, ‘res’, and
-    // ‘ID’ as parameters,
-    // and prints the returned previous node’s buildingNums and count, if a previous
-    // node was
-    // found.
-    // If no previous node was found, then '0 0' is printed.
-    // The time complexity of this function is O(log n).
-    // public void previous(int buildingNums) {
-    // Node[] res = new Node[2];
-    // Node[] ans = findNextPrev(root, res, buildingNums);
-    // Node previous = ans[0];
-    // if (previous != null)
-    // System.out.println(previous.getBuildingNums() + " " + previous.getCount());
-    // else
-    // System.out.println("0 0");
-    // }
-
-    // This function is a recursive function that returns the sum of the counts of
-    // the nodes
-    // with IDs within the range of ID1 and ID2, even when nodes with ID1 and ID2
-    // are not present in the tree.
-    // This function has a time complexity of O(log n + s) where ‘s’ is the number
-    // of IDs in the range.
-    // public int inRange(Node root, int ID1, int ID2) {
-    // if (root == nil)
-    // return 0;
-    // if (root.getBuildingNums() == ID1 && root.getBuildingNums() == ID2)
-    // return root.getCount();
-
-    // if (ID1 <= root.getBuildingNums() && ID2 >= root.getBuildingNums()) {
-    // // System.out.print(root.getBuildingNums()+" ");
-    // // System.out.println("call");
-    // return root.getCount() + inRange(root.getLeft(), ID1, ID2) +
-    // inRange(root.getRight(), ID1, ID2);
-    // } else if (ID1 < root.getBuildingNums()) {
-    // return inRange(root.getLeft(), ID1, ID2);
-
-    // } else {
-    // return inRange(root.getRight(), ID1, ID2);
-    // }
-    // }
-
-    // This function calls the inRange() function and prints the returned value,
-    // which is the sum of the counts of all the nodes with IDs within the range of
-    // ID1 and ID2.
-    // This function has a time complexity of O(log n + s) where ‘s’ is the number
-    // of IDs in the range.
-    // public void callInRange(int ID1, int ID2) {
-    // System.out.println(inRange(root, ID1, ID2));
-    // }
 
     // Function for in order traversal
     public void inOrder(Node root) {
