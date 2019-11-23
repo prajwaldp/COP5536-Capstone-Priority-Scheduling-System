@@ -169,369 +169,202 @@ public class RedBlackTree {
         p.setParent(leftChild);
     }
 
-    // This function replaces the subtree rooted at node u with the subtree rooted
-    // at node v.
-    public void transplant(Node u, Node v) {
-        if (u.getParent() == nil)
-            root = v;
-        else if (u == u.getParent().getLeft())
-            u.getParent().setLeft(v);
-        else
-            u.getParent().setRight(v);
-        v.setParent(u.getParent());
+    public void swap(Node a, Node b) {
+        if (a.getParent() == nil) {
+            this.root = b;
+        } else if (a == a.getParent().getLeft()) {
+            a.getParent().setLeft(b);
+        } else {
+            a.getParent().setRight(b);
+        }
+        
+        b.setParent(a.getParent());
     }
 
-    // A function to delete the node ‘z’ from a red-black tree. It has a time
-    // complexity of O(log n).
-    public void delete(Node z) {
-        Node y = z; // y is the node that was either removed or moved within the tree.
-        Node x; // x is the node that will move into y's original position
-        int origColor = y.getColor(); //// need to know whether y was black
-        if (z.getLeft() == nil) {
-            // no left child?
-            x = z.getRight();
-            // replace z by its right child
-            transplant(z, z.getRight());
-        } else if (z.getRight() == nil) {
-            // no right child?
-            x = z.getLeft();
-            // replace z by its left child
-            transplant(z, z.getLeft());
+    public void delete(Node n) {
+        Node x, y;
+        boolean yIsBlack;
+
+        y = n;
+        yIsBlack = y.isBlack();
+        
+        if (n.getLeft() == nil) {
+            x = n.getRight();
+            this.swap(n, n.getRight());
+        } else if (n.getRight() == nil) {
+            x = n.getLeft();
+            this.swap(n, n.getLeft());
         } else {
-            // Node z has two children.
-            // We find its successor y, which is in z's right subtree and has no left child.
-            y = z.getRight();
-            while (y.getLeft() != nil)
+            y = n.getRight();
+            
+            while (y.getLeft() != nil) {
                 y = y.getLeft();
-            origColor = y.getColor();
+            }
+            
+            yIsBlack = y.isBlack();
+            
             x = y.getRight();
-            // Remove y out of its current location, and replace z with it.
-            if (y.getParent() == z)
+            
+            if (y.getParent() == n) {
                 x.setParent(y);
-            else {
-                // If y is not z's right child, then replace y as a child of its parent by y's
-                // right child
-                transplant(y, y.getRight());
-                // turn z's right child into y's right child.
-                y.setRight(z.getRight());
+            } else {
+                this.swap(y, y.getRight());
+                y.setRight(n.getRight());
                 y.getRight().setParent(y);
             }
-            // Regardless of whether y was z's right child, replace z as a child of its
-            // parent by y
-            transplant(z, y);
-            // replace y's left child by z's left child.
-            y.setLeft(z.getLeft());
+
+            this.swap(n, y);
+            y.setLeft(n.getLeft());
             y.getLeft().setParent(y);
-            // y is colored with the same color as z.
-            y.setColor(z.getColor());
+            y.setColor(n.getColor());
         }
-        // If we removed a black node, then must call deleteFixUp() because
-        // black-heights are now incorrect.
-        if (origColor == 'b')
-            deleteFixUp(x);
+
+        if (yIsBlack) {
+            balanceAfterDeleting(x);
+        }
     }
 
-    // This function fixes the possible violation of the red-black properties
-    // caused by deleting a node using the delete() function.
-    public void deleteFixUp(Node x) {
-        while (x != root && x.isBlack()) {
-            if (x == x.getParent().getLeft()) {
-                Node w = x.getParent().getRight();
-                if (w.isRed()) {
-                    // Case 1: x's sibling w is red.
-                    w.setBlack();
-                    x.getParent().setRed();
-                    rotateLeftAround(x.getParent());
-                    w = x.getParent().getRight();
+    /*
+        Deleting a node
+        ===============
+
+        y = root of deficient subtree
+        py = parent of y
+
+        - If y is a red node, make it black
+        - If y is black and no py ⇒ done
+        - If y is black and py exists
+            - Xcn, X = R or L, c = color of v, n = # red nodes of v
+            - Rb0
+                - py = b ⇒ color change v
+                - py = r ⇒ color change py and v
+            - Rb1 and Rb2 ⇒ LR rotation
+            - Rr0 ⇒ LL rotation
+            - Rr1 ⇒ LR rotation
+    */
+    public void balanceAfterDeleting(Node y) {
+
+        /* 
+            py => parent of `y`
+            v => sibling of `y`
+        */
+        Node py, v;
+
+        // If y is black and py exists
+        while (y != root && y.isBlack()) {
+
+            py = y.getParent();
+
+            if (y == py.getLeft()) {
+                // X = L
+                v = py.getRight();
+                
+                if (v.isRed()) {
+                    // c = R
+                    v.setBlack();
+                    py.setRed();
+                    this.rotateLeftAround(py);
+                    v = py.getRight();
                 }
-                if (w.getLeft().isBlack() && w.getRight().isBlack()) {
-                    // Case 2: x's sibling w is black, and both of w's children are black.
-                    w.setRed();
-                    x = x.getParent();
+                
+                if (v.getLeft().isBlack() && v.getRight().isBlack()) {
+                    v.setRed();
+                    y = py;
                 } else {
-                    if (w.getRight().isBlack()) {
-                        // Case 3: x's sibling w is black, and the left child of w is red,
-                        // and w's right child is black.
-                        w.getLeft().setBlack();
-                        w.setRed();
-                        rotateRightAround(w);
-                        w = x.getParent().getRight();
+                    
+                    if (v.getRight().isBlack()) {
+                        v.getLeft().setBlack();
+                        v.setRed();
+                        this.rotateRightAround(v);
+                        v = py.getRight();
                     }
-                    // Case 4: x's sibling w is black, and the right child of w is red.
-                    w.setColor(x.getParent().getColor());
-                    x.getParent().setBlack();
-                    w.getRight().setBlack();
-                    rotateLeftAround(x.getParent());
-                    x = root;
+                    
+                    v.setColor(py.getColor());
+                    py.setBlack();
+                    v.getRight().setBlack();
+                    this.rotateLeftAround(py);
+                    y = root;
                 }
             } else {
-                Node w = x.getParent().getLeft();
-                if (w.isRed()) {
-                    // Case 1: x's sibling w is red.
-                    w.setBlack();
-                    x.getParent().setRed();
-                    rotateRightAround(x.getParent());
-                    w = x.getParent().getLeft();
+                // X = R
+                v = py.getLeft();
+                
+                if (v.isRed()) {
+                    // c = R
+                    v.setBlack();
+                    py.setRed();
+                    this.rotateRightAround(py);
+                    v = py.getLeft();
                 }
-                if (w.getRight().isBlack() && w.getLeft().isBlack()) {
-                    // Case 2: x's sibling w is black, and both of w's children are black.
-                    w.setRed();
-                    x = x.getParent();
+
+                if (v.getRight().isBlack() && v.getLeft().isBlack()) {
+                    v.setRed();
+                    y = py;
                 } else {
-                    if (w.getLeft().isBlack()) {
-                        // Case 3: x's sibling w is black, wand the right child of w is red,
-                        // and w's left child is black.
-                        w.getRight().setBlack();
-                        w.setRed();
-                        rotateLeftAround(w);
-                        w = x.getParent().getLeft();
+                    if (v.getLeft().isBlack()) {
+                        v.getRight().setBlack();
+                        v.setRed();
+                        rotateLeftAround(v);
+                        v = py.getLeft();
                     }
-                    // Case 4: x's sibling w is black, and the left child of w is red.
-                    w.setColor(x.getParent().getColor());
-                    x.getParent().setBlack();
-                    w.getLeft().setBlack();
-                    rotateRightAround(x.getParent());
-                    x = root;
+                    v.setColor(py.getColor());
+                    py.setBlack();
+                    v.getLeft().setBlack();
+                    this.rotateRightAround(py);
+                    y = root;
                 }
             }
         }
-        x.setBlack();
+        
+        y.setBlack();
     }
 
-    // This function searches the Red Black Tree for a node with buildingNums = ‘x',
-    // and
-    // returns the node if found.
-    // The time complexity of this function is O(log n).
-    public Node search(int x) {
-        Node ptr = root;
-        while (ptr != nil) {
-            if (ptr.getBuildingNum() == x)
-                return ptr;
-            else if (ptr.getBuildingNum() < x)
-                ptr = ptr.getRight();
-            else
-                ptr = ptr.getLeft();
+    public Node findByBuildingNum(int buildingNum) {
+        Node tmp = this.root;
+        
+        while (tmp != nil) {
+            if (tmp.getBuildingNum() == buildingNum) {
+                return tmp;
+            } else if (tmp.getBuildingNum() < buildingNum) {
+                tmp = tmp.getRight();
+            } else {
+                tmp = tmp.getLeft();
+            }
         }
+        
         return nil;
     }
 
-    public void search_range(Node root,int a,int b){
-        // System.out.println("Hello");
-        if(root == nil)
-        {
-            return;
+    public String findInRange(int buildingNum1, int buildingNum2) {
+        String outputStr = this.findInRange(this.root, buildingNum1, buildingNum2);
+
+        if (outputStr.length() != 0) {
+            return outputStr.substring(0, outputStr.length() - 1);
         }
 
-        if(root.getBuildingNum()>a)
-        {
-            // System.out.println(root.getBuildingNum());
-            search_range(root.getLeft(),a,b);
+        return "(0,0,0)";
+    }
+
+    private String findInRange(Node node, int buildingNum1, int buildingNum2) {
+        String outputStr = "";
+        int buildingNum = node.getBuildingNum();
+
+        if (node == nil) {
+            return outputStr;
         }
 
-        if(a <= root.getBuildingNum() && root.getBuildingNum() <= b)
-        {
-            // System.out.println(root.getBuildingNum());
-            this.output= this.output + "("+root.getBuildingNum()+"," + root.getExecutedTime()+"," +root.getTotal_time()+ "),";
+        if (buildingNum > buildingNum1) {
+            outputStr += this.findInRange(node.getLeft(), buildingNum1, buildingNum2);
         }
 
-        if(root.getBuildingNum()< b)
-        {
-            // System.out.println(root.getBuildingNum());
-            search_range(root.getRight(),a,b);
+        if (buildingNum1 <= buildingNum && buildingNum <= buildingNum2) {
+            outputStr += "(" + buildingNum + "," + node.getExecutedTime() + "," + node.getTotal_time()+ "),";
         }
-    }
 
-    // function to call search()
-    public void callSearch(int ele) {
-        search(ele);
-    }
-
-    // This function calls the search() function to find a node with buildingNums =
-    // ‘x’.
-    // If found, it then calls the delete() function passing the node that was
-    // returned by the search() function as an argument.
-    // The time complexity of this function is O(log n).
-    public void remove(int x) {
-        Node toDelete = search(x);
-        delete(toDelete);
-    }
-
-    // This function calls the search() function to find a node with buildingNums =
-    // ‘ID’.
-    // If found, it then increases the count of that node by ‘m’, and prints the
-    // count after increasing.
-    // Else, it calls the insert() function passing ‘ID’ and ‘m’ as arguments.
-    // The time complexity of this function in O(log n).
-    // public void increase(int buildingNums, int m) {
-    // Node toIncrease = search(buildingNums);
-    // if (toIncrease != nil) {
-    // int count = toIncrease.getCount();
-    // count = count + m;
-    // toIncrease.setCount(count);
-    // System.out.println(toIncrease.getCount());
-    // } else {
-    // insert(buildingNums, m);
-    // System.out.println(m);
-    // }
-    // }
-
-    // This function calls the search() function to find a node with buildingNums =
-    // ‘ID’.
-    // If found, it then decreases the count of that node by ‘m’, and prints the
-    // count after decreasing.
-    // However, if the count <= 0 after decreasing, the delete function() is called
-    // passing the node as an argument.
-    // If the node is not present or is removed, then ‘0’ is printed.
-    // The time complexity of this function in O(log n).
-    // public void reduce(int buildingNums, int m) {
-    // Node toReduce = search(buildingNums);
-    // if (toReduce != nil) {
-    // int count = toReduce.getCount();
-    // count = count - m;
-    // if (count > 0) {
-    // toReduce.setCount(count);
-    // System.out.println(toReduce.getCount());
-    // } else {
-    // delete(toReduce);
-    // System.out.println("0");
-    // }
-    // } else
-    // System.out.println("0");
-    // }
-
-    // This function calls the search() function to find a node with buildingNums =
-    // ‘ID’.
-    // If found, the function then prints the count of the found node. Else, it
-    // prints ‘0’.
-    // This function has a time complexity of O(log n).
-    public void count(int buildingNums) {
-        Node toCount = search(buildingNums);
-        if (toCount != nil) {
-            System.out.println(toCount.getExecutedTime());
-            System.out.println(toCount.getTotalTime());
-        } else
-            System.out.println("0");
-    }
-
-    // Function for in order traversal
-    public void inOrder(Node root) {
-        if (root == nil) {
-            return;
+        if (node.getBuildingNum() < buildingNum2) {
+            outputStr += this.findInRange(node.getRight(), buildingNum1, buildingNum2);
         }
-        inOrder(root.getLeft());
-        System.out.print(root.getBuildingNum() + "("+root.getTotalTime()+ ") " + root.color + "-> ");
-        inOrder(root.getRight());
-    }
-
-    // Function for pre order traversal
-    public void preOrder(Node root) {
-        if (root == nil) {
-            return;
-        }
-        System.out.print(root.getBuildingNum() + "->");
-        preOrder(root.getLeft());
-        preOrder(root.getRight());
-    }
-
-    // Function for post order traversal
-    public void postOrder(Node root) {
-        if (root == nil) {
-            return;
-        }
-        postOrder(root.getLeft());
-        postOrder(root.getRight());
-        System.out.print(root.getBuildingNum() + "->");
-    }
-
-    // Function to print traversal
-    public void printTraversal(String path) {
-        if (root != nil) {
-            if (path.equals(new String("postOrder"))) {
-                postOrder(root);
-            } else if (path.equals(new String("preOrder"))) {
-                preOrder(root);
-            } else {
-                inOrder(root);
-            }
-        }
-    }
-
-    // Function to print by level order
-    public void levelOrderTraversal(Node root, ArrayList<LinkedList<Node>> arrlist, int level) {
-        if (root == null) {
-            return;
-        }
-        LinkedList<Node> list = null;
-        if (level == arrlist.size()) {
-            list = new LinkedList<Node>();
-            arrlist.add(list);
-        } else {
-            list = arrlist.get(level);
-        }
-        list.add(root);
-        levelOrderTraversal(root.getLeft(), arrlist, level + 1);
-        levelOrderTraversal(root.getRight(), arrlist, level + 1);
-    }
-
-    // Function to call levelOrderTraversal()
-    // public void callLevelOrderTraversal() {
-    // ArrayList<LinkedList<Node>> lists = new ArrayList<LinkedList<Node>>();
-    // int lvl = 0;
-    // levelOrderTraversal(root, lists, lvl);
-    // int lenArrayList = lists.size();
-    // for (int i = 0; i < lenArrayList; i++) {
-    // /*
-    // * for(int k=lenArrayList-i;k>0;k--) System.out.print(" ");
-    // */
-    // int lenLinkedList = lists.get(i).size();
-    // for (int j = 0; j < lenLinkedList; j++) {
-    // Node tmp = lists.get(i).get(j);
-    // System.out.print(" " + "[" + tmp.getBuildingNum() + "," + tmp.getCount() +
-    // "]" + tmp.getColor());
-    // }
-    // System.out.println(" ");
-
-    // }
-    // }
-
-    // This function calls the initializeRBT() function, which then initializes the
-    // Red Black Tree from the sorted array of events.
-    // The returned node is then assigned as root of the Red Black Tree, and its
-    // parent is set to nil.
-    // The time complexity of this function is O(n).
-    public void callInitialize(int arr[][], int start, int end, int n) {
-        int h = (int) Math.ceil((Math.log(n)) / Math.log(2));
-        int lvl = 0;
-        root = initializeRBT(arr, start, end, lvl, h);
-        root.setParent(nil);
-    }
-
-    // This function initializes the Red Black Tree from an array of events
-    // containing buildingNums and count and sorted by buildingNums.
-    // This is done by making the middle element of the sorted array as the root of
-    // the Red Black Tree,
-    // and then recursively doing it for the left half and the right half.
-    // The root of the entire Red Black Tree is then returned.
-    // All nodes other than the immediate parents of external nodes are colored
-    // black,
-    // while the immediate parents of external nodes are colored red.
-    // The time complexity of this function is O(n).
-    public Node initializeRBT(int arr[][], int start, int end, int lvl, int h) {
-        if (start > end)
-            return nil;
-        int mid = (start + end) / 2;
-        Node node = new Node(0, 0, 0);
-        node.setBuildingNums(arr[mid][0]);
-        // node.setCount(arr[mid][1]);
-        // by default, node is colored black.
-        if (lvl == 0) // if current level is pointing to root level
-            node.setBlack();
-        if (lvl == h - 1) // current level is equal to the level immediately above sentinel nodes
-            node.setRed();
-        node.setLeft(initializeRBT(arr, start, mid - 1, lvl + 1, h));
-        node.getLeft().setParent(node);
-        node.setRight(initializeRBT(arr, mid + 1, end, lvl + 1, h));
-        node.getRight().setParent(node);
-        return node;
+        
+        return outputStr;
     }
 }

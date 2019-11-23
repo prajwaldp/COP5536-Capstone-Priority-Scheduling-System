@@ -40,13 +40,6 @@ public class bbst {
         return removedItem;
     }
 
-    static void print(MyMinHeap minHeap, RedBlackTree tree) {
-        System.out.println("MinHeap:");
-        minHeap.print();
-        System.out.println("\nRBTree");
-        tree.inOrder(tree.root);
-    }
-
     public static void main(String[] args) throws IOException {
         File inputFile = new File("input2.txt");
         Scanner sc = new Scanner(inputFile);
@@ -145,7 +138,7 @@ public class bbst {
 
                 else if (instructions[currInstruction][1] == PRINT) {
 
-                    Node print = tree.search(instructions[currInstruction][2]);
+                    Node print = tree.findByBuildingNum(instructions[currInstruction][2]);
                     if (print == nil) {
                         System.out.print("(0,0,0)");
                     } else
@@ -154,16 +147,9 @@ public class bbst {
                 }
 
                 else if (instructions[currInstruction][1] == PRINT_RANGE) {
-                    int a = buildingNum1;
-                    int b = buildingNum2;
-                    tree.search_range(tree.root, a, b);
-                    if(tree.output.length()!= 0)
-                        System.out.print(tree.output.substring(0,tree.output.length()-1));
-                    else
-                        System.out.print("(0,0,0)");
-                    tree.output = "";
-                    System.out.println();
+                    System.out.println(tree.findInRange(buildingNum1, buildingNum2));
                 }
+                
                 currInstruction++;
             }
 
