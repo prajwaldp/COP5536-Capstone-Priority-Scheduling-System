@@ -361,7 +361,7 @@ public class RedBlackTree {
             outputStr += "(" + buildingNum + "," + node.getExecutedTime() + "," + node.getTotal_time()+ "),";
         }
 
-        if (node.getBuildingNum() < buildingNum2) {
+        if (buildingNum < buildingNum2) {
             outputStr += this.findInRange(node.getRight(), buildingNum1, buildingNum2);
         }
         

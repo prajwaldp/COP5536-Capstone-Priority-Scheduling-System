@@ -94,28 +94,6 @@ public class MyMinHeap {
         }
     }
 
-    public void print() {
-        for (int i = 0; i < size; i++) {
-            System.out.println(
-                    this.heap[i].executedTime + ", " + this.heap[i].buildingNum + ", " + this.heap[i].totalTime);
-        }
-        System.out.println();
-
-        // for (int i = 0; i < size / 2; i++) {
-        // System.out.println("Parent : " + this.heap[i].val);
-
-        // if (this.heap[getLeftChild(i)] != null) {
-        // System.out.println("Left Child : " + this.heap[getLeftChild(i)].val);
-        // }
-
-        // if (this.heap[getRightChild(i)] != null) {
-        // System.out.println("Right Child : " + this.heap[getRightChild(i)].val);
-        // }
-
-        // System.out.println();
-        // }
-    }
-
     private int getParent(int position) {
         return position / 2;
     }
