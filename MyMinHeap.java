@@ -27,7 +27,7 @@ public class MyMinHeap {
         int position = this.size++;
         this.heap[position] = heapItem;
 
-        while (heap[position].executedTime < heap[getParent(position)].executedTime) {
+        while (heap[position].compareTo(heap[getParent(position)]) < 0) {
             this.swap(position, getParent(position));
             position = getParent(position);
         }

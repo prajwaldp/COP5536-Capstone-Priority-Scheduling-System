@@ -48,7 +48,7 @@ public class bbst {
     }
 
     public static void main(String[] args) throws IOException {
-        File inputFile = new File("input1.txt");
+        File inputFile = new File("input2.txt");
         Scanner sc = new Scanner(inputFile);
 
         String input = "";

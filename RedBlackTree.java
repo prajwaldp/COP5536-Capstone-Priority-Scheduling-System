@@ -46,51 +46,74 @@ public class RedBlackTree {
         return n;
     }
 
-    public void balanceAfterInserting(Node z) {
-        while (z.getParent().isRed()) {
-            if (z.getParent() == z.getParent().getParent().getLeft()) {
-                // z's parent is a left child.
-                Node y = z.getParent().getParent().getRight();
-                if (y.isRed()) {
-                    // Case 1: z's uncle y is red.
-                    z.getParent().setBlack();
-                    y.setBlack();
-                    z.getParent().getParent().setRed();
-                    z = z.getParent().getParent();
+    public void balanceAfterInserting(Node p) {
+
+        Node pp = p.getParent();  // Parent node
+        Node gp = p.getParent().getParent();  // Grand parent node
+        Node d;  // Uncle node
+
+        while (pp.isRed()) {
+            if (pp == gp.getLeft()) {
+                d = gp.getRight();  // pp is left child of gp - set d as right child
+                
+                if (d.isRed()) {
+                    /*
+                        XYr => color flip gp, pp and p
+                    */
+                    pp.setBlack();
+                    d.setBlack();
+                    gp.setRed();
+                    p = gp;
                 } else {
-                    if (z == z.getParent().getRight()) {
-                        // Case 2: z's uncle y is black and z is a right child.
-                        z = z.getParent();
-                        leftRotate(z);
+                    /*
+                        XYb => XY rotation
+                    */
+                    if (p == pp.getRight()) {
+                        /*
+                            XLb => XL rotate
+                        */
+                        p = pp;
+                        this.leftRotate(p);
                     }
-                    // Case 3: z's uncle y is black and z is a left child.
-                    z.getParent().setBlack();
-                    z.getParent().getParent().setRed();
-                    rightRotate(z.getParent().getParent());
+                    /*
+                        LRb or RRb => RR rotate
+                    */
+                    pp.setBlack();
+                    gp.setRed();
+                    this.rightRotate(gp);
                 }
             } else {
-                // z's parent is a right child.
-                Node y = z.getParent().getParent().getLeft();
-                if (y.isRed()) {
-                    // Case 1: z's uncle y is red.
-                    z.getParent().setBlack();
-                    y.setBlack();
-                    z.getParent().getParent().setRed();
-                    z = z.getParent().getParent();
+                d = gp.getLeft();  // pp is right child of gp - set d as left child
+                
+                if (d.isRed()) {
+                    /*
+                        XYr => color flip gp, pp and p
+                    */
+                    pp.setBlack();
+                    d.setBlack();
+                    gp.setRed();
+                    p = gp;
                 } else {
-                    if (z == z.getParent().getLeft()) {
-                        // Case 2: z's uncle y is black and z is a left child.
-                        z = z.getParent();
-                        rightRotate(z);
+                    /*
+                        XYb => XY rotation
+                    */
+                    if (p == pp.getLeft()) {
+                        /*
+                            XRb => XR rotate
+                        */
+                        p = pp;
+                        this.rightRotate(p);
                     }
-                    // Case 3: z's uncle y is black and z is a right child.
-                    z.getParent().setBlack();
-                    z.getParent().getParent().setRed();
-                    leftRotate(z.getParent().getParent());
+                    /*
+                        LRb or LLb => LL rotate
+                    */
+                    pp.setBlack();
+                    gp.setRed();
+                    this.leftRotate(gp);
                 }
             }
         }
-        // The root is always black.
+        
         root.setBlack();
     }
 
