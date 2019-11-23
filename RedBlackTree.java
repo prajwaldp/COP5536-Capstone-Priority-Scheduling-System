@@ -73,14 +73,14 @@ public class RedBlackTree {
                             XLb => XL rotate
                         */
                         p = pp;
-                        this.leftRotate(p);
+                        this.rotateLeftAround(p);
                     }
                     /*
                         LRb or RRb => RR rotate
                     */
                     pp.setBlack();
                     gp.setRed();
-                    this.rightRotate(gp);
+                    this.rotateRightAround(gp);
                 }
             } else {
                 d = gp.getLeft();  // pp is right child of gp - set d as left child
@@ -102,55 +102,71 @@ public class RedBlackTree {
                             XRb => XR rotate
                         */
                         p = pp;
-                        this.rightRotate(p);
+                        this.rotateRightAround(p);
                     }
                     /*
                         LRb or LLb => LL rotate
                     */
                     pp.setBlack();
                     gp.setRed();
-                    this.leftRotate(gp);
+                    this.rotateLeftAround(gp);
                 }
             }
         }
         
-        root.setBlack();
+        this.root.setBlack();
     }
 
-    // This function performs a left rotation around the node ‘x’.
-    public void leftRotate(Node x) {
-        Node y = x.getRight();
-        x.setRight(y.getLeft());
-        if (y.getLeft() != nil) {
-            y.getLeft().setParent(x);
+    /*
+        Private functions - not exposed as an API
+    */
+
+    private void rotateLeftAround(Node p) {
+        Node pp = p.getParent();
+        Node rightChild = p.getRight();
+        
+        p.setRight(rightChild.getLeft());
+        
+        if (rightChild.getLeft() != nil) {
+            rightChild.getLeft().setParent(p);
         }
-        y.setParent(x.getParent());
-        if (x.getParent() == nil)
-            root = y;
-        else if (x == x.getParent().getLeft())
-            x.getParent().setLeft(y);
-        else
-            x.getParent().setRight(y);
-        y.setLeft(x);
-        x.setParent(y);
+        
+        rightChild.setParent(pp);
+        
+        if (pp == nil) {
+            root = rightChild;
+        } else if (p == pp.getLeft()) {
+            pp.setLeft(rightChild);
+        } else {
+            pp.setRight(rightChild);
+        }
+        
+        rightChild.setLeft(p);
+        p.setParent(rightChild);
     }
 
-    // This function performs a right rotation around the node ‘x’.
-    public void rightRotate(Node x) {
-        Node y = x.getLeft();
-        x.setLeft(y.getRight());
-        if (y.getRight() != nil) {
-            y.getRight().setParent(x);
+    private void rotateRightAround(Node p) {
+        Node pp = p.getParent();
+        Node leftChild = p.getLeft();
+        
+        p.setLeft(leftChild.getRight());
+        
+        if (leftChild.getRight() != nil) {
+            leftChild.getRight().setParent(p);
         }
-        y.setParent(x.getParent());
-        if (x.getParent() == nil)
-            root = y;
-        else if (x == x.getParent().getRight())
-            x.getParent().setRight(y);
-        else
-            x.getParent().setLeft(y);
-        y.setRight(x);
-        x.setParent(y);
+        
+        leftChild.setParent(pp);
+        
+        if (pp == nil) {
+            root = leftChild;
+        } else if (p == pp.getRight()) {
+            pp.setRight(leftChild);
+        } else {
+            pp.setLeft(leftChild);
+        }
+        
+        leftChild.setRight(p);
+        p.setParent(leftChild);
     }
 
     // This function replaces the subtree rooted at node u with the subtree rooted
@@ -225,7 +241,7 @@ public class RedBlackTree {
                     // Case 1: x's sibling w is red.
                     w.setBlack();
                     x.getParent().setRed();
-                    leftRotate(x.getParent());
+                    rotateLeftAround(x.getParent());
                     w = x.getParent().getRight();
                 }
                 if (w.getLeft().isBlack() && w.getRight().isBlack()) {
@@ -238,14 +254,14 @@ public class RedBlackTree {
                         // and w's right child is black.
                         w.getLeft().setBlack();
                         w.setRed();
-                        rightRotate(w);
+                        rotateRightAround(w);
                         w = x.getParent().getRight();
                     }
                     // Case 4: x's sibling w is black, and the right child of w is red.
                     w.setColor(x.getParent().getColor());
                     x.getParent().setBlack();
                     w.getRight().setBlack();
-                    leftRotate(x.getParent());
+                    rotateLeftAround(x.getParent());
                     x = root;
                 }
             } else {
@@ -254,7 +270,7 @@ public class RedBlackTree {
                     // Case 1: x's sibling w is red.
                     w.setBlack();
                     x.getParent().setRed();
-                    rightRotate(x.getParent());
+                    rotateRightAround(x.getParent());
                     w = x.getParent().getLeft();
                 }
                 if (w.getRight().isBlack() && w.getLeft().isBlack()) {
@@ -267,14 +283,14 @@ public class RedBlackTree {
                         // and w's left child is black.
                         w.getRight().setBlack();
                         w.setRed();
-                        leftRotate(w);
+                        rotateLeftAround(w);
                         w = x.getParent().getLeft();
                     }
                     // Case 4: x's sibling w is black, and the left child of w is red.
                     w.setColor(x.getParent().getColor());
                     x.getParent().setBlack();
                     w.getLeft().setBlack();
-                    rightRotate(x.getParent());
+                    rotateRightAround(x.getParent());
                     x = root;
                 }
             }
