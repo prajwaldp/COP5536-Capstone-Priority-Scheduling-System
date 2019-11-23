@@ -8,11 +8,12 @@ public class RedBlackNode {
     RedBlackNode right;
     RedBlackNode parent;
     
-    int color;
-    public HeapItem heapItem;
+    private HeapItem heapItem;
 
+    int color;
     private static int BLACK = 0;
     private static int RED = 1;
+    
     static RedBlackNode SENTINEL_NODE = new RedBlackNode(0, 0, 0);
 
     RedBlackNode(int buildingNum, int executedTime, int totalTime) {
@@ -66,6 +67,10 @@ public class RedBlackNode {
         return this.color == BLACK;
     }
 
+    public HeapItem getHeapItem() {
+        return this.heapItem;
+    }
+
     /*
         Setters
     */
@@ -108,5 +113,13 @@ public class RedBlackNode {
 
     public void setHeapItem(HeapItem heapItem) {
         this.heapItem = heapItem;
+    }
+
+    /*
+        Modifiers
+    */
+
+    public void incrementExecutedTime() {
+        this.executedTime += 1;
     }
 }

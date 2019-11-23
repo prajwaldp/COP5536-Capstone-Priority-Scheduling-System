@@ -1,5 +1,10 @@
 public class Heap {
 
+    /*
+        A class-based implementation of the heap data structure
+        The heap implemented here is a min-heap
+    */
+
     private static int MAX_SIZE = 2000;
 
     private HeapItem heap[];
@@ -14,12 +19,18 @@ public class Heap {
         return this.size;
     }
 
-    HeapItem insert(int executedTime, int buildingNum, int totalTime) {
+    HeapItem insert(int executedTime, int buildingNum, int totalTime) throws DuplicateBuildingNumException {
         HeapItem node = new HeapItem(executedTime, buildingNum, totalTime);
         int position = this.size++;
         this.heap[position] = node;
 
-        while (heap[position].compareTo(heap[getParent(position)]) < 0) {
+        while (this.heap[position].compareTo(this.heap[getParent(position)]) < 0) {
+
+            if (this.heap[position].getBuildingNum() ==
+                    this.heap[getParent(position)].getBuildingNum()) {
+                throw new DuplicateBuildingNumException(this.heap[position].getBuildingNum());
+            }
+
             this.swap(position, getParent(position));
             position = getParent(position);
         }
@@ -27,17 +38,23 @@ public class Heap {
         return this.heap[position];
     }
 
-    void insert(HeapItem heapItem) {
+    void insert(HeapItem heapItem) throws DuplicateBuildingNumException {
         int position = this.size++;
         this.heap[position] = heapItem;
 
         while (heap[position].compareTo(heap[getParent(position)]) < 0) {
+
+            if (heap[position].getBuildingNum() ==
+                    heap[getParent(position)].getBuildingNum()) {
+                throw new DuplicateBuildingNumException(heap[position].getBuildingNum());
+            }
+
             this.swap(position, getParent(position));
             position = getParent(position);
         }
     }
 
-    HeapItem getMin() {
+    HeapItem peek() {
         return this.heap[0];
     }
 
@@ -50,7 +67,7 @@ public class Heap {
         HeapItem removedItem = this.heap[0];
         this.heap[0] = this.heap[--size];
         this.heap[size] = new HeapItem(Integer.MAX_VALUE, 0, 0);
-        this.minHeapify(0);
+        this.heapify(0);
 
         return removedItem;
     }
@@ -76,23 +93,23 @@ public class Heap {
 
     }
 
-    void minHeapify() {
+    void heapify() {
         for (int i = (size / 2); i >= 0; i--) {
-            minHeapify(i);
+            heapify(i);
         }
     }
 
-    void minHeapify(int i) {
+    void heapify(int i) {
         if (!isLeaf(i)) {
             if (this.heap[i].compareTo(this.heap[getLeftChild(i)]) > 0
                     || this.heap[i].compareTo(this.heap[getRightChild(i)]) > 0) {
 
                 if (this.heap[getLeftChild(i)].compareTo(this.heap[getRightChild(i)]) < 0) {
-                    swap(i, getLeftChild(i));
-                    minHeapify(getLeftChild(i));
+                    this.swap(i, getLeftChild(i));
+                    this.heapify(getLeftChild(i));
                 } else {
-                    swap(i, getRightChild(i));
-                    minHeapify(getRightChild(i));
+                    this.swap(i, getRightChild(i));
+                    this.heapify(getRightChild(i));
                 }
             }
         }
@@ -111,31 +128,6 @@ public class Heap {
     }
 
     private boolean isLeaf(int position) {
-        if (position >= (size / 2) && position <= size) {
-            return true;
-        }
-        return false;
-    }
-
-    boolean found(HeapItem currentlyWorkingOn, int bNum) {
-        if (size > 0) {
-            int b = 0;
-            int e = size - 1;
-            while (b <= e) {
-                int m = (b + e) / 2;
-                if (heap[m].buildingNum == bNum)
-                    return true;
-                else if (bNum > heap[m].buildingNum)
-                    b = m + 1;
-                else
-                    e = m - 1;
-            }
-        }
-        if (currentlyWorkingOn != null) {
-            if (currentlyWorkingOn.buildingNum == bNum)
-                return true;
-        }
-        return false;
-
+        return position >= (this.size / 2) && position <= this.size;
     }
 }
