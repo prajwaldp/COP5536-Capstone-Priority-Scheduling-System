@@ -6,30 +6,30 @@ public class bbst {
     static int INSERT = 0;
     static int PRINT = 1;
     static int PRINT_RANGE = 2;
-    public static Node nil = new Node(0, 0, 0);
+    public static RedBlackNode nil = new RedBlackNode(0, 0, 0);
 
-    static void insert(int buildingNum, int totalTime, MyMinHeap minHeap, RedBlackTree tree) {
+    static void insert(int buildingNum, int totalTime, Heap minHeap, RedBlackTree tree) {
         HeapItem heapItem = minHeap.insert(0, buildingNum, totalTime);
-        Node treeNode = tree.insert(buildingNum, totalTime);
+        RedBlackNode treeNode = tree.insert(buildingNum, totalTime);
         heapItem.rbtNode = treeNode;
         treeNode.heapItem = heapItem;
     }
 
-    static void insert(int executedTime, int buildingNum, int totalTime, MyMinHeap minHeap, RedBlackTree tree) {
+    static void insert(int executedTime, int buildingNum, int totalTime, Heap minHeap, RedBlackTree tree) {
         HeapItem heapItem = minHeap.insert(executedTime, buildingNum, totalTime);
-        Node treeNode = tree.insert(buildingNum, totalTime);
+        RedBlackNode treeNode = tree.insert(buildingNum, totalTime);
         heapItem.rbtNode = treeNode;
         treeNode.heapItem = heapItem;
     }
 
-    static void insert(HeapItem heapItem, MyMinHeap minHeap, RedBlackTree tree) {
+    static void insert(HeapItem heapItem, Heap minHeap, RedBlackTree tree) {
         HeapItem insertedHeapItem = minHeap.insert(heapItem.executedTime, heapItem.buildingNum, heapItem.totalTime);
-        Node treeNode = tree.insert(heapItem.buildingNum, heapItem.totalTime);
+        RedBlackNode treeNode = tree.insert(heapItem.buildingNum, heapItem.totalTime);
         insertedHeapItem.rbtNode = treeNode;
         treeNode.heapItem = insertedHeapItem;
     }
 
-    static HeapItem removeMin(MyMinHeap minHeap, RedBlackTree tree) {
+    static HeapItem removeMin(Heap minHeap, RedBlackTree tree) {
 
         HeapItem removedItem = minHeap.removeMin();
 
@@ -62,7 +62,7 @@ public class bbst {
         int currInstruction = 0;
 
         RedBlackTree tree = new RedBlackTree();
-        MyMinHeap minHeap = new MyMinHeap();
+        Heap minHeap = new Heap();
 
         while (sc.hasNextLine()) {
             input = sc.nextLine();
@@ -112,21 +112,21 @@ public class bbst {
 
         for (int timer = 0;; timer++) {
 
-            if (timer != 0 && instructions[currInstruction][0] == 0 && minHeap.size == 0
+            if (timer != 0 && instructions[currInstruction][0] == 0 && minHeap.getSize() == 0
                     && currentlyWorkingOn == null) {
                 break;
             }
 
             if (currentlyWorkingOn != null) {
                 currentlyWorkingOn.executedTime++;
-                currentlyWorkingOn.rbtNode.setExecuted_time(currentlyWorkingOn.rbtNode.getExecuted_time() + 1);
+                currentlyWorkingOn.rbtNode.setExecutedTime(currentlyWorkingOn.rbtNode.getExecutedTime() + 1);
                 daysPassed++;
             }
 
             if (instructions[currInstruction][0] == timer) {
                 if (instructions[currInstruction][1] == INSERT) {
                     buildingNum = instructions[currInstruction][2];
-                    if (minHeap.size > 0 || currentlyWorkingOn != null) {
+                    if (minHeap.getSize() > 0 || currentlyWorkingOn != null) {
                         if (minHeap.found(currentlyWorkingOn, buildingNum)) {
                             System.out.println("Duplicate building number not allowed!\nTerminating...");
                             break;
@@ -137,16 +137,8 @@ public class bbst {
                 }
 
                 else if (instructions[currInstruction][1] == PRINT) {
-
-                    Node print = tree.findByBuildingNum(instructions[currInstruction][2]);
-                    if (print == nil) {
-                        System.out.print("(0,0,0)");
-                    } else
-                        System.out.print("(" + print.getBuildingNum() + "," + print.getExecutedTime() + ","
-                                + print.getTotalTime() + ")");
-                }
-
-                else if (instructions[currInstruction][1] == PRINT_RANGE) {
+                    System.out.println(tree.find(instructions[currInstruction][2]));
+                } else if (instructions[currInstruction][1] == PRINT_RANGE) {
                     System.out.println(tree.findInRange(buildingNum1, buildingNum2));
                 }
                 
@@ -171,7 +163,7 @@ public class bbst {
                     daysPassed = 0;
                 }
 
-            } else if (minHeap.size > 0) {
+            } else if (minHeap.getSize() > 0) {
                 currentlyWorkingOn = removeMin(minHeap, tree);
             }
         }

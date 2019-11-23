@@ -4,7 +4,7 @@ class HeapItem implements Comparable<HeapItem>{
     int executedTime;
     int buildingNum;
     int totalTime;
-    Node rbtNode;
+    RedBlackNode rbtNode;
 
     HeapItem(int executedTime, int buildingNum, int totalTime) {
         this.executedTime = executedTime;

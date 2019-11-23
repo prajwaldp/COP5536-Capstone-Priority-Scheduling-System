@@ -1,30 +1,25 @@
-import java.util.ArrayList;
-import java.util.LinkedList;
-
 public class RedBlackTree {
-    public Node nil = new Node(0, 0, 0);
-    public Node root = nil;
 
-    public String output = "";
+    RedBlackNode root = RedBlackNode.SENTINEL_NODE;
 
-    public Node insert(int buildingNum, int totalTime) {
-        Node n = new Node(buildingNum, 0, totalTime);
+    public RedBlackNode insert(int buildingNum, int totalTime) {
+        RedBlackNode n = new RedBlackNode(buildingNum, 0, totalTime);
 
         n.setRed();
-        n.setLeft(nil);
-        n.setRight(nil);
+        n.setLeft(RedBlackNode.SENTINEL_NODE);
+        n.setRight(RedBlackNode.SENTINEL_NODE);
         
-        if (this.root == nil) {
+        if (this.root == RedBlackNode.SENTINEL_NODE) {
             n.setBlack();
-            n.setParent(nil);
+            n.setParent(RedBlackNode.SENTINEL_NODE);
             this.root = n;
             return this.root;
         }
         
-        Node curr = this.root;
-        Node prev = this.root;
+        RedBlackNode curr = this.root;
+        RedBlackNode prev = this.root;
 
-        while (curr != nil) {
+        while (curr != RedBlackNode.SENTINEL_NODE) {
             prev = curr;
             if (n.getBuildingNum() < curr.getBuildingNum()) {
                 curr = curr.getLeft();
@@ -46,11 +41,11 @@ public class RedBlackTree {
         return n;
     }
 
-    public void balanceAfterInserting(Node p) {
+    public void balanceAfterInserting(RedBlackNode p) {
 
-        Node pp = p.getParent();  // Parent node
-        Node gp = p.getParent().getParent();  // Grand parent node
-        Node d;  // Uncle node
+        RedBlackNode pp = p.getParent();  // Parent node
+        RedBlackNode gp = p.getParent().getParent();  // Grand parent node
+        RedBlackNode d;  // Uncle node
 
         while (pp.isRed()) {
             if (pp == gp.getLeft()) {
@@ -121,19 +116,19 @@ public class RedBlackTree {
         Private functions - not exposed as an API
     */
 
-    private void rotateLeftAround(Node p) {
-        Node pp = p.getParent();
-        Node rightChild = p.getRight();
+    private void rotateLeftAround(RedBlackNode p) {
+        RedBlackNode pp = p.getParent();
+        RedBlackNode rightChild = p.getRight();
         
         p.setRight(rightChild.getLeft());
         
-        if (rightChild.getLeft() != nil) {
+        if (rightChild.getLeft() != RedBlackNode.SENTINEL_NODE) {
             rightChild.getLeft().setParent(p);
         }
         
         rightChild.setParent(pp);
         
-        if (pp == nil) {
+        if (pp == RedBlackNode.SENTINEL_NODE) {
             root = rightChild;
         } else if (p == pp.getLeft()) {
             pp.setLeft(rightChild);
@@ -145,19 +140,19 @@ public class RedBlackTree {
         p.setParent(rightChild);
     }
 
-    private void rotateRightAround(Node p) {
-        Node pp = p.getParent();
-        Node leftChild = p.getLeft();
+    private void rotateRightAround(RedBlackNode p) {
+        RedBlackNode pp = p.getParent();
+        RedBlackNode leftChild = p.getLeft();
         
         p.setLeft(leftChild.getRight());
         
-        if (leftChild.getRight() != nil) {
+        if (leftChild.getRight() != RedBlackNode.SENTINEL_NODE) {
             leftChild.getRight().setParent(p);
         }
         
         leftChild.setParent(pp);
         
-        if (pp == nil) {
+        if (pp == RedBlackNode.SENTINEL_NODE) {
             root = leftChild;
         } else if (p == pp.getRight()) {
             pp.setRight(leftChild);
@@ -169,8 +164,8 @@ public class RedBlackTree {
         p.setParent(leftChild);
     }
 
-    public void swap(Node a, Node b) {
-        if (a.getParent() == nil) {
+    public void swap(RedBlackNode a, RedBlackNode b) {
+        if (a.getParent() == RedBlackNode.SENTINEL_NODE) {
             this.root = b;
         } else if (a == a.getParent().getLeft()) {
             a.getParent().setLeft(b);
@@ -181,23 +176,23 @@ public class RedBlackTree {
         b.setParent(a.getParent());
     }
 
-    public void delete(Node n) {
-        Node x, y;
+    public void delete(RedBlackNode n) {
+        RedBlackNode x, y;
         boolean yIsBlack;
 
         y = n;
         yIsBlack = y.isBlack();
         
-        if (n.getLeft() == nil) {
+        if (n.getLeft() == RedBlackNode.SENTINEL_NODE) {
             x = n.getRight();
             this.swap(n, n.getRight());
-        } else if (n.getRight() == nil) {
+        } else if (n.getRight() == RedBlackNode.SENTINEL_NODE) {
             x = n.getLeft();
             this.swap(n, n.getLeft());
         } else {
             y = n.getRight();
             
-            while (y.getLeft() != nil) {
+            while (y.getLeft() != RedBlackNode.SENTINEL_NODE) {
                 y = y.getLeft();
             }
             
@@ -242,13 +237,13 @@ public class RedBlackTree {
             - Rr0 ⇒ LL rotation
             - Rr1 ⇒ LR rotation
     */
-    public void balanceAfterDeleting(Node y) {
+    public void balanceAfterDeleting(RedBlackNode y) {
 
         /* 
             py => parent of `y`
             v => sibling of `y`
         */
-        Node py, v;
+        RedBlackNode py, v;
 
         // If y is black and py exists
         while (y != root && y.isBlack()) {
@@ -319,20 +314,14 @@ public class RedBlackTree {
         y.setBlack();
     }
 
-    public Node findByBuildingNum(int buildingNum) {
-        Node tmp = this.root;
-        
-        while (tmp != nil) {
-            if (tmp.getBuildingNum() == buildingNum) {
-                return tmp;
-            } else if (tmp.getBuildingNum() < buildingNum) {
-                tmp = tmp.getRight();
-            } else {
-                tmp = tmp.getLeft();
-            }
+    public String find(int buildingNum) {
+        RedBlackNode node = this.findByBuildingNum(buildingNum);
+
+        if (node == RedBlackNode.SENTINEL_NODE) {
+            return "(0,0,0)";
         }
-        
-        return nil;
+
+        return "(" + node.getBuildingNum() + "," + node.getExecutedTime() + "," + node.getTotalTime() + ")";
     }
 
     public String findInRange(int buildingNum1, int buildingNum2) {
@@ -345,11 +334,27 @@ public class RedBlackTree {
         return "(0,0,0)";
     }
 
-    private String findInRange(Node node, int buildingNum1, int buildingNum2) {
+    private RedBlackNode findByBuildingNum(int buildingNum) {
+        RedBlackNode tmp = this.root;
+        
+        while (tmp != RedBlackNode.SENTINEL_NODE) {
+            if (tmp.getBuildingNum() == buildingNum) {
+                return tmp;
+            } else if (tmp.getBuildingNum() < buildingNum) {
+                tmp = tmp.getRight();
+            } else {
+                tmp = tmp.getLeft();
+            }
+        }
+        
+        return RedBlackNode.SENTINEL_NODE;
+    }
+
+    private String findInRange(RedBlackNode node, int buildingNum1, int buildingNum2) {
         String outputStr = "";
         int buildingNum = node.getBuildingNum();
 
-        if (node == nil) {
+        if (node == RedBlackNode.SENTINEL_NODE) {
             return outputStr;
         }
 
@@ -358,7 +363,7 @@ public class RedBlackTree {
         }
 
         if (buildingNum1 <= buildingNum && buildingNum <= buildingNum2) {
-            outputStr += "(" + buildingNum + "," + node.getExecutedTime() + "," + node.getTotal_time()+ "),";
+            outputStr += "(" + buildingNum + "," + node.getExecutedTime() + "," + node.getTotalTime()+ "),";
         }
 
         if (buildingNum < buildingNum2) {
