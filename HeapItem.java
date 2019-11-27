@@ -4,13 +4,13 @@ class HeapItem implements Comparable<HeapItem>{
     int executedTime;
     int buildingNum;
     int totalTime;
-    RedBlackNode rbtNode;
+    RedBlackNode redBlackTreeNode;
 
     HeapItem(int executedTime, int buildingNum, int totalTime) {
         this.executedTime = executedTime;
         this.buildingNum = buildingNum;
         this.totalTime = totalTime;
-        this.rbtNode = null;
+        this.redBlackTreeNode = null;
     }
 
     @Override

@@ -1,69 +1,79 @@
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
 
-public class RisingCity {
+public class risingCity {
     public static void main(String[] args) throws IOException, DuplicateBuildingNumException {
 
-        String inputFile = "input2.txt";
-        String line;  // To store each command
+        if (args.length != 1) {
+            System.out.println("Invalid arguments");
+            System.exit(-1);
+        }
 
-        int worldTime = 0;  // Store the current timestamp since start of execution
+        RedBlackTree redBlackTree = new RedBlackTree();
+        Heap heap = new Heap();
+        HeapItem activeBuilding = null;  // The building being worked on
+
+        String outputFile = "output_file.txt";
+        BufferedWriter outputFileHandler = new BufferedWriter(new FileWriter(outputFile));
+        StringBuilder str = new StringBuilder();
+
+        int day = 0;  // Store the days passed since start of execution
 
         /*
             Store # days for which building has been in construction
             Reset to 0 when incremented from 5
         */
-        int localTime = 0;
-        
+        int activeBuildingDay = 0;
+
         Command c;
 
         int arg1, arg2;  // variables for Insert instruction
 
-        RedBlackTree redBlackTree = new RedBlackTree();
-        Heap heap = new Heap();
-        HeapItem currentlyWorkingOn = null;
-
-        BufferedReader br = new BufferedReader(new FileReader(inputFile));
-        line = br.readLine();
+        String inputFile = args[0];
+        String line;  // To store each command
+        BufferedReader inputFileHandler = new BufferedReader(new FileReader(inputFile));
+        line = inputFileHandler.readLine();
         c = new Command(line);
 
         while (true) {
 
-            if (line == null && heap.getSize() == 0 && currentlyWorkingOn == null) {
+            if (line == null && heap.getSize() == 0 && activeBuilding == null) {
                 break;
             }
 
-            if (currentlyWorkingOn != null) {
-                currentlyWorkingOn.executedTime++;
-                currentlyWorkingOn.rbtNode.incrementExecutedTime();
-                localTime++;
+            if (activeBuilding != null) {
+                activeBuilding.executedTime++;
+                activeBuilding.redBlackTreeNode.incrementExecutedTime();
+                activeBuildingDay++;
             }
 
-            if (c.getTimestamp() == worldTime) {
+            if (c.getTimestamp() == day) {
                 arg1 = c.getArg1();  // Stores the buildingNum
-                
+
                 /*
                     Stores
                     - the totalTime for Command.INSERT
                     - -1 for Command.PRINT
                     - the second buildingNum for Command.PRINT_RANGE
-                    
+
                 */
                 arg2 = c.getArg2();
 
                 if (c.getOperationCode() == Command.INSERT) {
 
                     try {
-                        if (currentlyWorkingOn != null && currentlyWorkingOn.buildingNum == arg1) {
+                        if (activeBuilding != null && activeBuilding.buildingNum == arg1) {
                             throw new DuplicateBuildingNumException(arg1);
                         }
 
                         HeapItem heapItem = heap.insert(0, arg1, arg2);  // also throws DuplicateBuildingNumException
                         RedBlackNode redBlackNode = redBlackTree.insert(arg1, arg2);
-                        heapItem.rbtNode = redBlackNode;
+                        heapItem.redBlackTreeNode = redBlackNode;
                         redBlackNode.setHeapItem(heapItem);
-                    
+
                     } catch(DuplicateBuildingNumException e) {
                         System.err.println("Error at " + c.getLine() + ". Exiting with status -1");
                         System.exit(-1);
@@ -71,39 +81,45 @@ public class RisingCity {
                 }
 
                 else if (c.getOperationCode() == Command.PRINT) {
-                    System.out.println(redBlackTree.find(arg1));
+                    str.append(redBlackTree.find(arg1));
+                    str.append("\n");
                 } else if (c.getOperationCode() == Command.PRINT_RANGE) {
-                    System.out.println(redBlackTree.findInRange(arg1, arg2));
+                    str.append(redBlackTree.findInRange(arg1, arg2));
+                    str.append("\n");
                 }
-                
-                line = br.readLine();
+
+                line = inputFileHandler.readLine();
                 if (line != null) {
                     c = new Command(line);
                 }
             }
 
-            if (currentlyWorkingOn != null) {
+            if (activeBuilding != null) {
 
-                if (currentlyWorkingOn.executedTime == currentlyWorkingOn.totalTime) {
-                    System.out.println("(" + currentlyWorkingOn.buildingNum + "," + worldTime + ")");
-                    redBlackTree.delete(currentlyWorkingOn.rbtNode);
-                    localTime = 0;
-                    currentlyWorkingOn = heap.removeMin();
+                if (activeBuilding.executedTime == activeBuilding.totalTime) {
+                    str.append("(" + activeBuilding.buildingNum + "," + day + ")");
+                    str.append("\n");
+
+                    redBlackTree.delete(activeBuilding.redBlackTreeNode);
+                    activeBuildingDay = 0;
+                    activeBuilding = heap.removeMin();
                 }
 
-                if (localTime >= 5) {
-                    heap.insert(currentlyWorkingOn);
-                    currentlyWorkingOn = heap.removeMin();
-                    localTime = 0;
+                if (activeBuildingDay >= 5) {
+                    heap.insert(activeBuilding);
+                    activeBuilding = heap.removeMin();
+                    activeBuildingDay = 0;
                 }
 
             } else if (heap.getSize() > 0) {
-                currentlyWorkingOn = heap.removeMin();
+                activeBuilding = heap.removeMin();
             }
 
-            worldTime++;
+            day++;
         }
 
-        br.close();
+        inputFileHandler.close();
+        outputFileHandler.write(str.toString());
+        outputFileHandler.close();
     }
 }

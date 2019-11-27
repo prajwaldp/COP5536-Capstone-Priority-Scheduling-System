@@ -87,9 +87,9 @@ public class Heap {
         this.heap[a].totalTime = this.heap[b].totalTime;
         this.heap[b].totalTime = tmp.totalTime;
 
-        tmp.rbtNode = this.heap[a].rbtNode;
-        this.heap[a].rbtNode = this.heap[b].rbtNode;
-        this.heap[b].rbtNode = tmp.rbtNode;
+        tmp.redBlackTreeNode = this.heap[a].redBlackTreeNode;
+        this.heap[a].redBlackTreeNode = this.heap[b].redBlackTreeNode;
+        this.heap[b].redBlackTreeNode = tmp.redBlackTreeNode;
 
     }
 
