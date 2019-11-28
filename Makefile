@@ -2,8 +2,8 @@ compile:
 	@echo "Compiling files"
 	javac Command.java
 	javac DuplicateBuildingNumException.java
-	javac Heap.java
-	javac HeapItem.java
+	javac MinHeap.java
+	javac HeapNode.java
 	javac RedBlackNode.java
 	javac RedBlackTree.java
 	javac risingCity.java

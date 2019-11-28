@@ -5,6 +5,13 @@ import java.io.FileWriter;
 import java.io.IOException;
 
 public class risingCity {
+    /**
+     * The main function is in the risingCity class and is the entry point of the program
+     * @param args The command line arguments given to the program. The path to the input
+     * file for the program is expected.
+     * @throws IOException
+     * @throws DuplicateBuildingNumException
+     */
     public static void main(String[] args) throws IOException, DuplicateBuildingNumException {
 
         if (args.length != 1) {
@@ -13,8 +20,8 @@ public class risingCity {
         }
 
         RedBlackTree redBlackTree = new RedBlackTree();
-        Heap heap = new Heap();
-        HeapItem activeBuilding = null;  // The building being worked on
+        MinHeap heap = new MinHeap();
+        HeapNode activeBuilding = null;  // The building being worked on
 
         String outputFile = "output_file.txt";
         BufferedWriter outputFileHandler = new BufferedWriter(new FileWriter(outputFile));
@@ -28,7 +35,7 @@ public class risingCity {
         */
         int activeBuildingDay = 0;
 
-        Command c;
+        Command c;  // An object that serializes each line in the input file
 
         int arg1, arg2;  // variables for Insert instruction
 
@@ -40,12 +47,23 @@ public class risingCity {
 
         while (true) {
 
+            /*
+             The program exits when
+             - All the lines in the input file are processed, and
+             - The heap has no more nodes, and
+             - There is no building currently being worked on
+             */
             if (line == null && heap.getSize() == 0 && activeBuilding == null) {
                 break;
             }
 
+            /*
+             if there is a building being worked on,
+             - increment the executed time of the heap node, and the corresponding red black node
+             - increment the days the building has been being worked on
+             */
             if (activeBuilding != null) {
-                activeBuilding.executedTime++;
+                activeBuilding.incrementExecutedTime();
                 activeBuilding.redBlackTreeNode.incrementExecutedTime();
                 activeBuildingDay++;
             }
@@ -69,10 +87,10 @@ public class risingCity {
                             throw new DuplicateBuildingNumException(arg1);
                         }
 
-                        HeapItem heapItem = heap.insert(0, arg1, arg2);  // also throws DuplicateBuildingNumException
+                        HeapNode heapNode = heap.insert(0, arg1, arg2);  // also throws DuplicateBuildingNumException
                         RedBlackNode redBlackNode = redBlackTree.insert(arg1, arg2);
-                        heapItem.redBlackTreeNode = redBlackNode;
-                        redBlackNode.setHeapItem(heapItem);
+                        heapNode.redBlackTreeNode = redBlackNode;
+                        redBlackNode.setHeapNode(heapNode);
 
                     } catch(DuplicateBuildingNumException e) {
                         System.err.println("Error at " + c.getLine() + ". Exiting with status -1");
