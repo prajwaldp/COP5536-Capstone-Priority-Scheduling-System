@@ -127,3 +127,7 @@ $ cat output_file.txt
 (50,310)
 (15,410)
 ```
+
+## LICENSE
+
+This software is licensed under GNU GPLv3.

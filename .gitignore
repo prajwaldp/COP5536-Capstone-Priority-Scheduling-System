@@ -1,5 +1,4 @@
 *.class
-*.txt
 docs/*
 .idea/*
 .vscode/*
