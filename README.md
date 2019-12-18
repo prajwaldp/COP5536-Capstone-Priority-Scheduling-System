@@ -50,18 +50,59 @@ completion date of the new city is output.
 ## Instructions
 
 1. Unzip the zipped archive, change directory to it and compile the java files
-into class files using the following command (on Linux)
-```
-$ make
-```
+into class files using the following command (on Linux) ``` $ make ```
 
-2. Run the program using the following command
-```
-$ java risingCity [input-file.txt]
-```
+2. Run the program using the following command ``` $ java risingCity
+[input-file.txt] ```
 
 3. The output of the program is written to the file o​ utput_file.txt​. Use the
-following command to view the content of the output file.
-```
-$ cat output_file.txt
-```
+following command to view the content of the output file. ``` $ cat
+output_file.txt ```
+
+## Implementation Details
+
+1. There are two counters for keeping track of passing days - d​ ay​ keeps track
+of the days passed since the construction began and ​activeBuildingDay​ keeps
+track of the days passed since work began on the currently active building.
+
+2. As buildings are introduced with passing days, they are inserted into the
+MinHeap.
+
+3. If no building is being worked on, the building returned by the r​ emoveMin​
+operation on the MinHeap is marked as the active building.
+
+4. With every passing day, the ​executedTime​ of the building being worked on is
+incremented (both, the HeapNode’s and the RedBlackNode’s ​executedTime attribute
+is incremented).
+
+5. When it‘s time for work to cease on the a​ ctiveBuilding​ (when it has been
+under construction for 5 days, with buildings in the queue), it is reinserted
+back into the MinHeap. The a​ ctiveBuildingDay​ counter is reset. The building
+that is then removed from the MinHeap (using the ​removeMin​ operation) becomes
+the activeBuilding. The removeMin operation returns the building with the least
+executed time (and building number, if the executed time is equal).
+
+6. As buildings are inserted into the MinHeap (except, when the building is
+reinserted after being worked on), corresponding RedBlackNode objects are
+inserted into the RedBlackTree. When a building is completed, it is not
+reinserted back into the MinHeap and the corresponding RedBlackNode is deleted.
+
+7. Since the RedBlackTree is a self-balancing binary search tree and contains
+all the buildings, it is used to retrieve buildings by the building number or in
+a range of building numbers efficiently.
+
+## Results
+
+The zip archive contains the 7 java files and a sample input and output file
+(along with the Makefile). The result of the program when run for the sample
+input is given below:
+
+``` $ java risingCity input_file.txt $ cat output_file.txt
+(15,1,200),(50,45,100) (15,45,200),(50,45,100) (15,47,200),(50,45,100)
+(15,50,200),(30,0,50),(50,45,100) (15,50,200),(30,1,50),(50,45,100)
+(15,50,200),(30,5,50),(50,45,100) (15,50,200),(30,40,50),(50,45,100)
+(15,50,200),(30,45,50),(40,45,60),(50,45,100)
+(15,50,200),(30,50,50),(40,45,60),(50,45,100) (30,190)
+(15,50,200),(40,50,60),(50,45,100) (15,50,200),(40,50,60),(50,50,100)
+(15,55,200),(40,54,60),(50,50,100) (15,55,200),(40,55,60),(50,51,100) (40,225)
+(50,310) (15,410) ```
