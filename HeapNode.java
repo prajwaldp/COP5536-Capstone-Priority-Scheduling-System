@@ -2,7 +2,7 @@ import java.util.Comparator;
 
 /**
  * A HeapNode is stored in the MinHeap.heap and represents
- * an individual building with the building number, th
+ * an individual building with the building number, the
  * executed time and the total time.
  */
 

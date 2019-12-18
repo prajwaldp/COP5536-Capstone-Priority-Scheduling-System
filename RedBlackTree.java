@@ -100,10 +100,10 @@ public class RedBlackTree {
 
         if (n.getLeft() == RedBlackNode.SENTINEL_NODE) {
             x = n.getRight();
-            this.pull(n, n.getRight());
+            this.move(n, n.getRight());
         } else if (n.getRight() == RedBlackNode.SENTINEL_NODE) {
             x = n.getLeft();
-            this.pull(n, n.getLeft());
+            this.move(n, n.getLeft());
         } else {
             y = n.getRight();
 
@@ -118,12 +118,12 @@ public class RedBlackTree {
             if (y.getParent() == n) {
                 x.setParent(y);
             } else {
-                this.pull(y, y.getRight());
+                this.move(y, y.getRight());
                 y.setRight(n.getRight());
                 y.getRight().setParent(y);
             }
 
-            this.pull(n, y);
+            this.move(n, y);
             y.setLeft(n.getLeft());
             y.getLeft().setParent(y);
             y.setColor(n.getColor());
@@ -271,11 +271,11 @@ public class RedBlackTree {
     }
 
     /**
-     * Positions the second RedBlackNode to be the uncle of the first RedBlackNode
-     * @param a The RedBlackNode whose uncle is to be set
-     * @param b The RedBlackNode to be set as uncle
+     * Moves the second RedBlackNode into the position of the first RedBlackNode
+     * @param a The RedBlackNode whose position is to be moved to
+     * @param b The RedBlackNode to be moved
      */
-    public void pull(RedBlackNode a, RedBlackNode b) {
+    private void move(RedBlackNode a, RedBlackNode b) {
         if (a.getParent() == RedBlackNode.SENTINEL_NODE) {
             this.root = b;
         } else if (a == a.getParent().getLeft()) {
@@ -291,7 +291,7 @@ public class RedBlackTree {
      * Balances the red black tree around a deficient subtree after a delete operation
      * @param y The root of the deficient subtree
      */
-    public void balanceAfterDeleting(RedBlackNode y) {
+    private void balanceAfterDeleting(RedBlackNode y) {
 
         /*
          Balancing after deleting a node

@@ -1,3 +1,6 @@
 *.class
 *.txt
 docs/*
+.idea/*
+.vscode/*
+ADS-Project-Report-*.pdf
